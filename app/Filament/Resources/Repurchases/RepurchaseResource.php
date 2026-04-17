@@ -37,6 +37,11 @@ class RepurchaseResource extends Resource
             ->columns([
                 TextColumn::make('id'),
 
+                // 🔥 TAMPILKAN PENGIRIM
+                TextColumn::make('user.name')
+                    ->label('Nama')
+                    ->searchable(),
+
                 TextColumn::make('item_name')->label('Item'),
 
                 TextColumn::make('qty'),
@@ -46,11 +51,6 @@ class RepurchaseResource extends Resource
                 TextColumn::make('total'),
 
                 TextColumn::make('supplier'),
-
-                // 🔥 TAMPILKAN PENGIRIM
-                TextColumn::make('user.name')
-                    ->label('Pengirim')
-                    ->searchable(),
 
                 TextColumn::make('created_at')->dateTime(),
 
@@ -142,12 +142,12 @@ class RepurchaseResource extends Resource
 
         $query = parent::getEloquentQuery();
 
-        // 🔐 FINANCE & DIREKTUR → lihat semua
-        if ($user->hasAnyRole(['finance', 'direktur'])) {
+        // ✅ DIREKTUR & FINANCE → lihat semua
+        if ($user->hasAnyRole(['direktur', 'finance'])) {
             return $query;
         }
 
-        // 🔐 USER LAIN → hanya lihat miliknya sendiri
+        // ✅ USER → hanya data miliknya sendiri
         return $query->where('user_id', $user->id);
     }
 

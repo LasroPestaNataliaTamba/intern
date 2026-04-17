@@ -15,7 +15,7 @@
 @foreach($this->repurchases as $r)
 
 <tr>
-
+<td>{{ $r->user->name }}</td>
 <td>{{ $r->item_name }}</td>
 <td>{{ $r->qty }}</td>
 <td>{{ $r->price }}</td>

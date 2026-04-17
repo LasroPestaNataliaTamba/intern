@@ -116,7 +116,6 @@ class LeaveApproval extends Page
     | REJECT FLOW
     |--------------------------------------------------------------------------
     */
-
     public function reject()
     {
         if (!$this->selected) return;
