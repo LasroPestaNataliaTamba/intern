@@ -1,301 +1,232 @@
 <x-filament::page>
 
-<div class="flex gap-3 mb-6">
-
-<x-filament::button
-color="success"
-type="button"
-onclick="getLocation()">
-Check In
-</x-filament::button>
-
-<x-filament::button
-color="danger"
-wire:click="checkOut"
-:disabled="!$today || $today->check_out">
-Check Out
-</x-filament::button>
-
-</div>
-
-
-{{-- TODAY --}}
-@if($today)
-
-<div class="p-4 border rounded mb-6 bg-white shadow-sm">
-
-<h3 class="font-bold text-lg mb-3">
-Today Attendance
-</h3>
-
-<div class="grid grid-cols-2 gap-4">
-
-<div>
-<p class="text-sm text-gray-500">Jam Masuk</p>
-<p class="font-semibold">
-{{ \Carbon\Carbon::parse($today->check_in)->format('H:i') }}
-</p>
-</div>
-
-<div>
-<p class="text-sm text-gray-500">Jam Keluar</p>
-<p class="font-semibold">
-{{ $today->check_out
-? \Carbon\Carbon::parse($today->check_out)->format('H:i')
-: '-' }}
-</p>
-</div>
-
-</div>
-
-<p class="mt-3">
-Status :
-@if($today->status == 'late')
-<span class="px-2 py-1 bg-red-100 text-red-600 rounded text-xs font-semibold">Late</span>
-@else
-<span class="px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-semibold">On Time</span>
-@endif
-</p>
-
-@if($today->latitude)
-<p class="mt-3">
-Lokasi :
-<a
-href="https://www.google.com/maps?q={{ $today->latitude }},{{ $today->longitude }}"
-target="_blank"
-class="text-blue-600 underline">
-Lihat di Maps
-</a>
-</p>
-@endif
-
-</div>
-
-@endif
-
-
-
-{{-- 🔥 KHUSUS HR & DIREKTUR --}}
-@if(auth()->user()->hasAnyRole(['HR','direktur']))
-
-{{-- ✅ ABSENSI HARI INI --}}
-<div class="p-4 border rounded mb-6 bg-white shadow-sm">
-
-<h3 class="font-bold text-lg mb-3">
-Absensi Hari Ini (Semua Karyawan)
-</h3>
-
-<div class="overflow-x-auto">
-<table class="w-full border border-gray-300 text-sm">
-
-<thead class="bg-gray-100 text-gray-700">
-<tr>
-<th class="p-3 border">Nama</th>
-<th class="p-3 border">Jam Masuk</th>
-<th class="p-3 border">Jam Keluar</th>
-<th class="p-3 border">Status</th>
-</tr>
-</thead>
-
-<tbody>
-
-@forelse($this->todayAttendances as $att)
-<tr class="hover:bg-gray-50">
-
-<td class="p-3 border">{{ $att->user->name }}</td>
-
-<td class="p-3 border">
-{{ \Carbon\Carbon::parse($att->check_in)->format('H:i') }}
-</td>
-
-<td class="p-3 border">
-{{ $att->check_out
-? \Carbon\Carbon::parse($att->check_out)->format('H:i')
-: '-' }}
-</td>
-
-<td class="p-3 border">
-
-@if($att->status == 'late')
-<span class="px-2 py-1 bg-red-100 text-red-600 rounded text-xs font-semibold">
-Late
-</span>
-@else
-<span class="px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-semibold">
-On Time
-</span>
-@endif
-
-</td>
-
-</tr>
-@empty
-<tr>
-<td colspan="4" class="text-center p-3">Belum ada absensi</td>
-</tr>
-@endforelse
-
-</tbody>
-
-</table>
-</div>
-
-</div>
-
-
-{{-- 🔴 BELUM ABSEN --}}
-<div class="p-4 border rounded mb-6 bg-white shadow-sm">
-
-<h3 class="font-bold text-lg mb-3 text-red-600">
-Belum Absen Hari Ini
-</h3>
-
-<div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-
-@forelse($this->notCheckedIn as $user)
-<div class="p-2 bg-red-50 border border-red-200 rounded text-sm">
-{{ $user->name }}
-</div>
-@empty
-<div class="text-green-600">Semua sudah absen ✅</div>
-@endforelse
-
-</div>
-
-</div>
-
-
-{{-- 🟡 BELUM CHECK OUT --}}
-<div class="p-4 border rounded mb-6 bg-white shadow-sm">
-
-<h3 class="font-bold text-lg mb-3 text-yellow-600">
-Belum Check Out
-</h3>
-
-<table class="w-full border text-sm">
-
-<thead class="bg-gray-100">
-<tr>
-<th class="p-2 border">Nama</th>
-<th class="p-2 border">Jam Masuk</th>
-</tr>
-</thead>
-
-<tbody>
-
-@forelse($this->notCheckedOut as $att)
-<tr class="hover:bg-gray-50">
-<td class="p-2 border">{{ $att->user->name }}</td>
-<td class="p-2 border">
-{{ \Carbon\Carbon::parse($att->check_in)->format('H:i') }}
-</td>
-</tr>
-@empty
-<tr>
-<td colspan="2" class="text-center p-2 text-green-600">
-Semua sudah check out ✅
-</td>
-</tr>
-@endforelse
-
-</tbody>
-
-</table>
-
-</div>
-
-@endif
-
-
-
-{{-- HISTORY --}}
-<div class="p-4 border rounded bg-white shadow-sm">
-
-<h3 class="font-bold text-lg mb-3">
-Riwayat Absensi
-</h3>
-
-<table class="w-full border text-sm">
-
-<thead class="bg-gray-100">
-<tr>
-
-@if(auth()->user()->hasAnyRole(['HR','direktur']))
-<th class="p-3 border">Nama</th>
-@endif
-
-<th class="p-3 border">Tanggal</th>
-<th class="p-3 border">Masuk</th>
-<th class="p-3 border">Keluar</th>
-<th class="p-3 border">Status</th>
-
-</tr>
-</thead>
-
-<tbody>
-
-@foreach($this->history as $h)
-
-<tr class="hover:bg-gray-50">
-
-@if(auth()->user()->hasAnyRole(['HR','direktur']))
-<td class="p-3 border">{{ $h->user->name ?? '-' }}</td>
-@endif
-
-<td class="p-3 border">
-{{ \Carbon\Carbon::parse($h->date)->format('d M Y') }}
-</td>
-
-<td class="p-3 border">
-{{ \Carbon\Carbon::parse($h->check_in)->format('H:i') }}
-</td>
-
-<td class="p-3 border">
-{{ $h->check_out
-? \Carbon\Carbon::parse($h->check_out)->format('H:i')
-: '-' }}
-</td>
-
-<td class="p-3 border">
-
-@if($h->status == 'late')
-<span class="px-2 py-1 bg-red-100 text-red-600 rounded text-xs font-semibold">
-Late
-</span>
-@else
-<span class="px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-semibold">
-On Time
-</span>
-@endif
-
-</td>
-
-</tr>
-
-@endforeach
-
-</tbody>
-
-</table>
-
-</div>
-
-
+<div class="mx-auto max-w-6xl space-y-6">
+    {{-- Action Buttons --}}
+    <div class="flex flex-col sm:flex-row gap-3">
+        <x-filament::button
+            color="success"
+            type="button"
+            icon="heroicon-o-map-pin"
+            size="lg"
+            onclick="getLocation()">
+            Check In
+        </x-filament::button>
+
+        <x-filament::button
+            color="danger"
+            wire:click="checkOut"
+            icon="heroicon-o-arrow-right-on-rectangle"
+            size="lg"
+            :disabled="!$today || $today->check_out">
+            Check Out
+        </x-filament::button>
+    </div>
+
+    {{-- TODAY --}}
+    @if($today)
+    <x-filament::section
+        class="!h-auto"
+        title="Today's Attendance"
+        description="Your attendance status for today"
+        icon="heroicon-o-calendar"
+        collapsible
+        collapsed="false">
+
+    <div class="overflow-x-auto">
+    <table class="w-full border border-gray-300 border-separate border-spacing-4 text-sm">
+
+            {{-- Header --}}
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="border px-6 py-3 text-center">Check In</th>
+                    <th class="border px-6 py-3 text-center">Check Out</th>
+                    <th class="border px-6 py-3 text-center">Status</th>
+                </tr>
+            </thead>
+
+            {{-- Isi --}}
+            <tbody>
+                <tr class="text-center">
+
+                    <td class="border px-6 py-4">
+                        🔒 {{ \Carbon\Carbon::parse($today->check_in)->format('H:i') }}
+                    </td>
+
+                    <td class="border px-6 py-4">
+                        🔓 {{ $today->check_out ? \Carbon\Carbon::parse($today->check_out)->format('H:i') : '—' }}
+                    </td>
+
+                    <td class="border px-6 py-4">
+                        @if($today->status == 'late')
+                            <span class="text-red-500 font-semibold">⚠️ Late</span>
+                        @else
+                            <span class="text-green-600 font-semibold">✅ On Time</span>
+                        @endif
+                    </td>
+
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+    </x-filament::section>
+    @endif
+
+    @if(auth()->user()->hasAnyRole(['HR','direktur']))
+    {{-- TODAY ATTENDANCES FOR HR/DIREKTUR --}}
+    <x-filament::section
+        class="!h-auto"
+        title="Today's Employee Attendance"
+        description="All employees who have checked in today"
+        icon="heroicon-o-users"
+        collapsible
+        collapsed="false">
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="border-b-2 border-gray-300 bg-gray-50">
+                        <th class="px-6 py-2 text-left text-gray-600 font-medium">Name</th>
+                        <th class="px-6 py-2 text-left text-gray-600 font-medium">Check In</th>
+                        <th class="px-6 py-2 text-left text-gray-600 font-medium">Check Out</th>
+                        <th class="px-6 py-2 text-left text-gray-600 font-medium">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($this->todayAttendances as $att)
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-6 py-2 text-gray-700">{{ $att->user->name }}</td>
+                        <td class="px-6 py-2 text-gray-700">{{ \Carbon\Carbon::parse($att->check_in)->format('H:i') }}</td>
+                        <td class="px-6 py-2 text-gray-700">{{ $att->check_out ? \Carbon\Carbon::parse($att->check_out)->format('H:i') : '—' }}</td>
+                        <td class="px-6 py-2 text-gray-700">{{ $att->status === 'late' ? 'Late' : 'On Time' }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-gray-400">No attendance today</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+    </x-filament::section>
+
+    <x-filament::section
+        class="!h-auto"
+        title="Not Checked In Today"
+        description="Employees who have not checked in yet"
+        icon="heroicon-o-clock"
+        collapsible
+        collapsed="false">
+
+        @if($this->notCheckedIn->isEmpty())
+            <div class="text-center py-6 text-gray-500">All employees have checked in today.</div>
+        @else
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                @foreach($this->notCheckedIn as $user)
+                <div class="p-3 bg-red-50 border-l-4 border-red-400 rounded-r-lg text-sm text-red-700">
+                    {{ $user->name }}
+                </div>
+                @endforeach
+            </div>
+        @endif
+
+    </x-filament::section>
+
+    <x-filament::section
+        class="!h-auto"
+        title="Not Checked Out"
+        description="Employees who still need to check out"
+        icon="heroicon-o-arrow-left-on-rectangle"
+        collapsible
+        collapsed="false">
+
+        @if($this->notCheckedOut->isEmpty())
+            <div class="text-center py-6 text-gray-500">Everyone has checked out.</div>
+        @else
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="border-b-2 border-gray-300 bg-gray-50">
+                            <th class="px-6 py-2 text-left text-gray-600 font-medium">Name</th>
+                            <th class="px-6 py-2 text-left text-gray-600 font-medium">Check In</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($this->notCheckedOut as $att)
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-2 text-gray-700">{{ $att->user->name }}</td>
+                            <td class="px-6 py-2 text-gray-700">{{ \Carbon\Carbon::parse($att->check_in)->format('H:i') }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+
+    </x-filament::section>
+    @endif
+
+    {{-- HISTORY --}}
+    <x-filament::section
+        class="!h-auto"
+        title="Attendance History"
+        description="Your attendance records"
+        icon="heroicon-o-document-chart-bar"
+        collapsible
+        collapsed="false">
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="border-b-2 border-gray-300 bg-gray-50">
+                        @if(auth()->user()->hasAnyRole(['HR','direktur']))
+                        <th class="px-6 py-2 text-left text-gray-600 font-medium">Name</th>
+                        @endif
+                        <th class="px-6 py-2 text-left text-gray-600 font-medium">Date</th>
+                        <th class="px-6 py-2 text-left text-gray-600 font-medium">Check In</th>
+                        <th class="px-6 py-2 text-left text-gray-600 font-medium">Check Out</th>
+                        <th class="px-6 py-2 text-left text-gray-600 font-medium">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($this->history as $h)
+                    <tr class="border-b hover:bg-gray-50">
+                        @if(auth()->user()->hasAnyRole(['HR','direktur']))
+                        <td class="px-6 py-2 text-gray-700">{{ $h->user->name ?? '—' }}</td>
+                        @endif
+                        <td class="px-6 py-2 text-gray-700">{{ $h->date }}</td>
+                        <td class="px-6 py-2 text-gray-700">{{ $h->check_in }}</td>
+                        <td class="px-6 py-2 text-gray-700">{{ $h->check_out ?? '—' }}</td>
+                        <td class="px-6 py-2 text-gray-700">{{ $h->status }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="{{ auth()->user()->hasAnyRole(['HR','direktur']) ? 5 : 4 }}" class="text-center py-4 text-gray-400">No history</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+    </x-filament::section>
 
 <script>
 function getLocation(){
-navigator.geolocation.getCurrentPosition(
-function(position){
-window.Livewire.dispatch('checkInLocation',{
-lat: position.coords.latitude,
-lng: position.coords.longitude
-});
-},
-function(error){
-alert('GPS gagal diambil');
-}
-);
+    navigator.geolocation.getCurrentPosition(
+        function(position){
+            window.Livewire.dispatch('checkInLocation', {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            });
+        },
+        function(error){
+            alert('GPS gagal diambil');
+        }
+    );
 }
 </script>
+
+</div>
 
 </x-filament::page>

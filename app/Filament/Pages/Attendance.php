@@ -18,6 +18,13 @@ class Attendance extends Page
 
     public $today;
 
+    public $requireNote = false;
+    public $note;
+
+    protected $officeLat = -6.2117285;
+    protected $officeLng = 106.8600611;
+    protected $maxDistance = 150; // meter
+
     public function mount()
     {
         $this->loadToday();
@@ -120,5 +127,49 @@ class Attendance extends Page
             ->whereDate('date', today())
             ->whereNull('check_out')
             ->get();
+    }
+
+    public function distance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371000;
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat/2) * sin($dLat/2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon/2) * sin($dLon/2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+
+        return $earthRadius * $c;
+    }
+
+    // #[On('checkInLocation')]
+    public function checkInLocation($data)
+    {
+        $userLat = $data['lat'];
+        $userLng = $data['lng'];
+
+        $distance = $this->distance($userLat, $userLng, $this->officeLat, $this->officeLng);
+
+        if ($distance > $this->maxDistance) {
+            $this->requireNote = true;
+        } else {
+            $this->requireNote = false;
+
+            // langsung simpan absensi
+            $this->saveAttendance($userLat, $userLng, null);
+        }
+    }
+
+    public function submitNote()
+    {
+        if ($this->requireNote && empty($this->note)) {
+            $this->addError('note', 'Wajib isi alasan jika di luar lokasi');
+            return;
+        }
+
+        $this->saveAttendance(null, null, $this->note);
     }
 }

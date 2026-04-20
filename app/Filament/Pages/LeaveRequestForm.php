@@ -14,6 +14,8 @@ class LeaveRequestForm extends Page
 
     protected string $view = 'filament.pages.leave-request-form';
 
+    public $id;
+    public $name;
     public $start_date;
     public $end_date;
     public $reason;
@@ -31,6 +33,7 @@ class LeaveRequestForm extends Page
             $this->start_date = $this->leave->start_date;
             $this->end_date = $this->leave->end_date;
             $this->reason = $this->leave->reason;
+            $this->name = $this->leave->name;
 
             $this->isDetail = true;
         }
@@ -39,7 +42,7 @@ class LeaveRequestForm extends Page
     public function submit()
     {
         \App\Models\LeaveRequest::create([
-            'user_id' => auth()->id(),
+            'name' => auth()->user()->name,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'reason' => $this->reason,
