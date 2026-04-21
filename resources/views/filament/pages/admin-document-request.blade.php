@@ -10,7 +10,7 @@
 
         <thead class="bg-gray-100">
             <tr>
-                <th class="p-3 border text-left">User</th>
+                <th class="p-3 border text-left">Nama</th>
                 <th class="p-3 border text-left">Jenis</th>
                 <th class="p-3 border text-left">Keterangan</th>
                 <th class="p-3 border text-left">Tanggal</th>

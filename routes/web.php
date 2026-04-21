@@ -7,5 +7,5 @@ Route::get('/leave-pdf/{id}', [LeavePdfController::class, 'generate'])
     ->name('leave.pdf');
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('filament.admin.auth.login');
 });

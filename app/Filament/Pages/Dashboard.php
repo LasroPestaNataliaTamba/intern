@@ -17,6 +17,7 @@ class Dashboard extends BaseDashboard
             \App\Filament\Widgets\FinanceChart::class,
             \App\Filament\Widgets\LeaveRequestTable::class,
             \App\Filament\Widgets\DocumentRequestTable::class,
+            \App\Filament\Widgets\DocumentRequestList::class,
         ];
     }
 }
