@@ -4,7 +4,7 @@ namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
 use BackedEnum;
-use Filament\Support\Icons\Heroicon;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use App\Models\LeaveRequest;
 
@@ -22,6 +22,22 @@ class LeaveRequestForm extends Page
     public $leave;
     public $isDetail = false;
     public $requests = [];
+    public $sisa_cuti;
+
+     protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('edit')
+                ->label('Edit')
+                ->icon('heroicon-o-pencil')
+                ->url(fn () => route('filament.admin.pages.leave-request', ['id' => $this->id])),
+        ];
+    }
+
+     public function getRequestsProperty()
+    {
+        return LeaveRequest::latest()->get();
+    }
 
     public function mount()
     {
@@ -34,6 +50,7 @@ class LeaveRequestForm extends Page
             $this->end_date = $this->leave->end_date;
             $this->reason = $this->leave->reason;
             $this->name = $this->leave->name;
+            $this->sisa_cuti = $this->leave->sisa_cuti;
 
             $this->isDetail = true;
         }
@@ -42,9 +59,11 @@ class LeaveRequestForm extends Page
     public function submit()
     {
         \App\Models\LeaveRequest::create([
+            'user_id' => auth()->id(),
             'name' => auth()->user()->name,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
+            'sisa_cuti' => $this->sisa_cuti, // ❗ FIX: hitung sisa cuti berdasarkan tanggal
             'reason' => $this->reason,
 
             'division_status' => 'pending',

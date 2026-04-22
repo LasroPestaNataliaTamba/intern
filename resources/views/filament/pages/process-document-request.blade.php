@@ -8,6 +8,7 @@
     <p><b>Jenis:</b> {{ $recordModel->type }}</p>
     <p><b>Keperluan:</b> {{ $recordModel->purpose }}</p>
     <p><b>Tanggal:</b> {{ $recordModel->needed_date }}</p>
+    <p><b>Sisa Cuti:</b> {{ $recordModel->sisa_cuti }}</p>
 
     <a href="{{ asset('storage/'.$recordModel->attachment) }}"
        class="text-blue-600 underline">

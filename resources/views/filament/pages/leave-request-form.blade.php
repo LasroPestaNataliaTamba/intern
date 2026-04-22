@@ -15,52 +15,71 @@
 
 <div style="max-width:900px;margin:auto">
 
-    {{-- ================= FORM ================= --}}
-    <div style="
-        background:white;
-        padding:40px;
-        border-radius:12px;
-        box-shadow:0 4px 20px rgba(0,0,0,0.08);
-        margin-bottom:30px;
-    ">
+{{-- ================= FORM ================= --}}
+<div style="
+    background:white;
+    padding:40px;
+    border-radius:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom:30px;
+">
 
-        <h2 style="font-size:24px;font-weight:bold;margin-bottom:20px">
-            Request Cuti
-        </h2>
+    <h2 style="font-size:24px;font-weight:bold;margin-bottom:25px">
+        Request Cuti
+    </h2>
 
-        <form wire:submit.prevent="submit">
+    <form wire:submit.prevent="submit">
 
-            <div style="display:flex;gap:20px;margin-bottom:20px">
+        {{-- GRID 2 KOLOM --}}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
 
-                <div style="flex:1">
-                    <label>Rencana Berangkat</label>
-                    <input type="date" wire:model="start_date"
-                        style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid #ddd;">
-                </div>
-
-                <div style="flex:1">
-                    <label>Rencana Kembali</label>
-                    <input type="date" wire:model="end_date"
-                        style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid #ddd;">
-                </div>
-
+            {{-- LEFT --}}
+            <div>
+                <label>Rencana Berangkat</label>
+                <input type="date" wire:model="start_date"
+                    style="width:100%;margin-top:8px;padding:12px;border-radius:8px;border:1px solid #ddd;">
             </div>
 
-            <div style="margin-bottom:20px">
+            {{-- RIGHT --}}
+            <div>
+                <label>Sisa Cuti (hari)</label>
+                <input type="number" wire:model="sisa_cuti"
+                    style="width:100%;margin-top:8px;padding:12px;border-radius:8px;border:1px solid #ddd;">
+            </div>
+
+            {{-- LEFT --}}
+            <div>
+                <label>Rencana Kembali</label>
+                <input type="date" wire:model="end_date"
+                    style="width:100%;margin-top:8px;padding:12px;border-radius:8px;border:1px solid #ddd;">
+            </div>
+
+            {{-- RIGHT --}}
+            <div>
                 <label>Keperluan Cuti</label>
                 <textarea wire:model="reason"
-                    style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid #ddd;"></textarea>
+                    style="width:100%;margin-top:8px;padding:12px;border-radius:8px;border:1px solid #ddd;height:100px"></textarea>
             </div>
 
-            <button type="submit"
-                style="background:#16a34a;color:white;padding:10px 30px;border-radius:8px;">
-                Submit
-            </button>
+        </div>
 
-        </form>
+        {{-- SUBMIT FULL WIDTH --}}
+        <button type="submit"
+            style="
+                width:100%;
+                background:#16a34a;
+                color:white;
+                padding:14px;
+                border-radius:10px;
+                font-weight:bold;
+                font-size:16px;
+            ">
+            Submit
+        </button>
 
-    </div>
+    </form>
 
+</div>
     {{-- ================= HISTORY ================= --}}
     <div style="
         background:white;
@@ -88,6 +107,7 @@
                 <th style="padding:10px;border">Tanggal</th>
                 <th style="padding:10px;border">Alasan</th>
                 <th style="padding:10px;border">Status</th>
+                <th style="padding:10px;border">Sisa Cuti</th>
 
                 @if($isApprover)
                     <th style="padding:10px;border">Aksi</th>
@@ -127,7 +147,10 @@
                     @endif
                 </td>
 
-                {{-- 🔥 BUTTON DETAIL --}}
+                <td style="padding:10px;border">
+                    {{ $r->sisa_cuti }}
+                </td>
+
                 {{-- 🔥 BUTTON DETAIL --}}
                 @if($isApprover)
                 <td style="padding:10px;border">
@@ -151,7 +174,7 @@
             @empty
 
             <tr>
-                <td colspan="6" style="text-align:center;padding:15px">
+                <td colspan="{{ $isApprover ? 7 : 5 }}" style="text-align:center;padding:15px">
                     Belum ada data
                 </td>
             </tr>

@@ -41,7 +41,7 @@ td, th{
 <body>
 
 <div style="text-align:center;margin-bottom:20px">
-    <img src="{{ public_path('images/Kop_Surat_Header AGS_2025.jpg') }}"
+    <img src="<?php echo e(public_path('images/Kop_Surat_Header AGS_2025.jpg')); ?>"
          style="width:100%;max-height:120px;object-fit:contain;">
 </div>
 
@@ -50,7 +50,8 @@ FORMULIR IZIN CUTI KARYAWAN
 </div>
 
 <div class="right">
-Jakarta, {{ now()->format('d F Y') }}
+Jakarta, <?php echo e(now()->format('d F Y')); ?>
+
 </div>
 
 <div class="section">
@@ -71,19 +72,21 @@ Dengan Hormat,<br><br>
 Saya yang bertanda tangan di bawah ini:
 <br><br>
 
-Nama     : {{ $leave->user->name }} <br>
-Jabatan  : {{ $leave->user->position ?? 'Staff' }}
+Nama     : <?php echo e($leave->user->name); ?> <br>
+Jabatan  : <?php echo e($leave->user->position ?? 'Staff'); ?>
+
 </div>
 
 <div class="section">
 Dengan ini mengajukan permohonan cuti kerja sebagai berikut:
 <br><br>
 
-Mulai Tanggal           : {{ $leave->start_date }} <br>
-Sampai Dengan Tanggal   : {{ $leave->end_date }} <br>
-Jumlah Hari Cuti        : {{ \Carbon\Carbon::parse($leave->start_date)->diffInDays($leave->end_date)+1 }} Hari <br>
-Sisa Cuti               : {{ $leave->sisa_cuti }} Hari <br>
-Untuk Keperluan         : {{ $leave->reason }}
+Mulai Tanggal           : <?php echo e($leave->start_date); ?> <br>
+Sampai Dengan Tanggal   : <?php echo e($leave->end_date); ?> <br>
+Jumlah Hari Cuti        : <?php echo e(\Carbon\Carbon::parse($leave->start_date)->diffInDays($leave->end_date)+1); ?> Hari <br>
+Sisa Cuti               : <?php echo e($leave->sisa_cuti); ?> Hari <br>
+Untuk Keperluan         : <?php echo e($leave->reason); ?>
+
 </div>
 
 <div class="section">
@@ -104,7 +107,7 @@ Demikian permohonan cuti kerja ini saya ajukan.
 </tr>
 
 <tr>
-<td>{{ $leave->user->name }}</td>
+<td><?php echo e($leave->user->name); ?></td>
 <td>Head Division</td>
 <td>Agustina Panjaitan</td>
 </tr>
@@ -118,3 +121,4 @@ Demikian permohonan cuti kerja ini saya ajukan.
 
 </body>
 </html>
+<?php /**PATH C:\xampp\htdocs\ags-system\resources\views/pdf/leave.blade.php ENDPATH**/ ?>

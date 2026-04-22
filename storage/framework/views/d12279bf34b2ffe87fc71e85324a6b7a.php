@@ -54,6 +54,7 @@
 
     <th class="border p-3">Status</th>
     <th class="border p-3">Tanggal</th>
+    <th class="border p-3">Sisa Cuti</th>
     <th class="border p-3">Alasan</th>
     <th class="border p-3">Aksi</th>
 </tr>

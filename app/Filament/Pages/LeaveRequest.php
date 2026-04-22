@@ -13,6 +13,7 @@ class LeaveRequest extends Page
     public $editingId = null;
     public $start_date;
     public $end_date;
+    public $sisa_cuti;
     public $reason;
 
     // ✅ FIX DI SINI
@@ -53,6 +54,7 @@ class LeaveRequest extends Page
         $this->editingId = $leave->id;
         $this->start_date = $leave->start_date;
         $this->end_date = $leave->end_date;
+        $this->sisa_cuti = $leave->sisa_cuti; // ❗ FIX: hitung sisa cuti berdasarkan tanggal
         $this->reason = $leave->reason;
     }
 
@@ -62,6 +64,7 @@ class LeaveRequest extends Page
             ->update([
                 'start_date' => $this->start_date,
                 'end_date' => $this->end_date,
+                'sisa_cuti' => $this->sisa_cuti, // ❗ FIX: hitung sisa cuti berdasarkan tanggal
                 'reason' => $this->reason,
             ]);
 
@@ -74,6 +77,7 @@ class LeaveRequest extends Page
             'editingId',
             'start_date',
             'end_date',
+            'sisa_cuti',
             'reason'
         ]);
     }
