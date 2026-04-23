@@ -30,6 +30,12 @@ class UserForm
                     ->password()
                     ->required(),
 
+                Forms\Components\Select::make('roles')
+                    ->label('Role')
+                    ->multiple()
+                    ->options(Role::pluck('name', 'name'))
+                    ->required(),  
+
             ]);
     }
 }

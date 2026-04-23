@@ -41,8 +41,17 @@ td, th{
 <body>
 
 <div style="text-align:center;margin-bottom:20px">
-    <img src="{{ public_path('images/Kop_Surat_Header AGS_2025.jpg') }}"
-         style="width:100%;max-height:120px;object-fit:contain;">
+    @php
+        $company = $leave->user->company ?? 'AGS';
+    @endphp
+
+    @if($company == 'AGS')
+        <img src="{{ public_path('images/Kop_Surat_Header AGS_2025.jpg') }}"
+             style="width:100%;max-height:120px;">
+    @elseif($company == 'WINCORE')
+        <img src="{{ public_path('images/WINCORE-LOGO.png') }}"
+             style="width:100%;max-height:120px;">
+    @endif
 </div>
 
 <div class="title">

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Filament\Panel;
+use App\Models\Company;
 
 class User extends Authenticatable
 {
@@ -31,8 +32,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function canAccessPanel(Panel $panel): bool
+    public function company()
     {
-        return $this->hasRole('admin') && $this->is_active;
+        return $this->belongsTo(Company::class);
     }
 }
