@@ -9,10 +9,11 @@ use App\Models\User;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables;
 use Filament\Forms;
 use Spatie\Permission\Models\Role;
+use Filament\Forms\Components\Select;
 
 class UserResource extends Resource
 {
@@ -43,6 +44,11 @@ class UserResource extends Resource
                 ->multiple()
                 ->options(Role::pluck('name', 'name'))
                 ->required(),
+
+            Select::make('company_id')
+                ->relationship('company', 'name')
+                ->searchable()
+                ->preload()
         ]);
     }
 

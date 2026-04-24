@@ -3,21 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\LeaveRequest;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 
 class LeavePdfController extends Controller
 {
     public function generate($id)
     {
-        $leave = LeaveRequest::with('user')->findOrFail($id);
+        $leave = LeaveRequest::with('user.company')->findOrFail($id);
 
-        if ($leave->final_status !== 'approved') {
-            abort(403);
-        }
+        $pdf = SnappyPdf::loadView('pdf.leave', [
+            'leave' => $leave
+        ])->setOption('enable-local-file-access', true);
 
-        $pdf = Pdf::loadView('pdf.leave', compact('leave'))
-            ->setPaper('A4', 'portrait');
-
-        return $pdf->download('surat-cuti-'.$leave->id.'.pdf');
+        return $pdf->download('surat-cuti.pdf');
     }
 }

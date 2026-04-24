@@ -41,17 +41,8 @@ td, th{
 <body>
 
 <div style="text-align:center;margin-bottom:20px">
-    @php
-        $company = $leave->user->company ?? 'AGS';
-    @endphp
-
-    @if($company == 'AGS')
-        <img src="{{ public_path('images/Kop_Surat_Header AGS_2025.jpg') }}"
-             style="width:100%;max-height:120px;">
-    @elseif($company == 'WINCORE')
-        <img src="{{ public_path('images/WINCORE-LOGO.png') }}"
-             style="width:100%;max-height:120px;">
-    @endif
+    <img src="file:///{{ public_path($leave->user->company->logo ?? 'images/Kop_Surat_Header AGS_2025.jpg') }}"
+         style="width:100%;max-height:120px;">
 </div>
 
 <div class="title">
@@ -66,7 +57,7 @@ Jakarta, {{ now()->format('d F Y') }}
 Kepada Yth,<br>
 <b>Ibu Agustina Panjaitan</b><br>
 <b>Direktur</b><br>
-><b>PT. Arkamaya Guna Saharsa</b><br>
+<b>PT. Arkamaya Guna Saharsa</b><br>
 Di tempat
 </div>
 
