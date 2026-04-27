@@ -22,6 +22,6 @@ class AdminDocumentRequest extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->role === 'administrasi';
+        return auth()->user()?->division?->name === 'Administrasi';
     }
 }

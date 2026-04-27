@@ -30,7 +30,7 @@ class DocumentRequestPage extends Page
         }
 
         // 🧑‍💼 ADMIN → lihat semua
-        if ($user->role === 'administrasi') {
+        if ($user->division?->name === 'Administrasi') {
             return DocumentRequest::with('user')
                 ->latest()
                 ->get();
@@ -62,7 +62,7 @@ class DocumentRequestPage extends Page
 
             // 🔒 user tidak boleh edit punya orang lain
             if (
-                auth()->user()->role !== 'administrasi' &&
+                auth()->user()->division?->name !== 'Administrasi' &&
                 $request->user_id !== auth()->id()
             ) {
                 abort(403);
@@ -105,7 +105,7 @@ class DocumentRequestPage extends Page
 
         // 🔒 proteksi edit
         if (
-            auth()->user()->role !== 'administrasi' &&
+            auth()->user()->division?->name !== 'Administrasi' &&
             $data->user_id !== auth()->id()
         ) {
             abort(403);

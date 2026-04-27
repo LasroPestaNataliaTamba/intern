@@ -25,7 +25,7 @@ class ProcessDocumentRequest extends Page
 
     public function mount()
     {
-        if (auth()->user()->role !== 'administrasi') {
+        if (auth()->user()->division?->name !== 'Administrasi') {
             abort(403);
         }
 

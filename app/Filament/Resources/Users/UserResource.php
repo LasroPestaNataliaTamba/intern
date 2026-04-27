@@ -42,10 +42,17 @@ class UserResource extends Resource
             Forms\Components\Select::make('roles')
                 ->label('Role')
                 ->multiple()
-                ->options(Role::pluck('name', 'name'))
+                ->relationship('roles', 'name')
+                ->preload()
                 ->required(),
 
-            Select::make('company_id')
+            Forms\Components\Select::make('division_id')
+                ->relationship('division', 'name')
+                ->searchable()
+                ->preload()
+                ->required(),
+
+            Forms\Components\Select::make('company_id')
                 ->relationship('company', 'name')
                 ->searchable()
                 ->preload()

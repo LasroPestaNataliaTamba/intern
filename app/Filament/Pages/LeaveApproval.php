@@ -37,9 +37,26 @@ class LeaveApproval extends Page
 
     public function getRequestsProperty()
     {
-        return LeaveRequest::with('user')
-            ->latest()
-            ->get();
+        $user = auth()->user();
+
+        $query = LeaveRequest::with('user')->latest();
+
+        // Kepala divisi → lihat semua request di divisinya
+        if ($user->hasRole('kepala divisi')) {
+            $query->whereHas('user', function ($q) use ($user) {
+                $q->where('division_id', $user->division_id);
+            });
+        }
+        // HR & Direktur → lihat semua
+        elseif ($user->hasAnyRole(['HR', 'direktur'])) {
+            return $query->get();
+        }
+        // selain itu → cuma lihat punya sendiri
+        else {
+            $query->where('user_id', $user->id);
+        }
+
+        return $query->get();
     }
 
     /*
