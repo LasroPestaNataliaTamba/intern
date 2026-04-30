@@ -36,12 +36,32 @@ class LeaveRequestForm extends Page
 
      public function getRequestsProperty()
     {
-        return LeaveRequest::latest()->get();
+        $user = auth()->user();
+
+        if ($user->hasAnyRole(['kepala divisi', 'HR', 'direktur'])) {
+            return LeaveRequest::latest()->get();
+        }
+
+        return LeaveRequest::where('user_id', $user->id)
+            ->latest()
+            ->get();
     }
 
     public function mount()
     {
         $id = request()->get('id');
+
+        if ($id) {
+        $leave = \App\Models\LeaveRequest::findOrFail($id);
+        $user = auth()->user();
+
+        // 🔒 proteksi akses
+        if (
+            !$user->hasAnyRole(['kepala divisi', 'HR', 'direktur']) &&
+            $leave->user_id !== $user->id
+        ) {
+            abort(403);
+        }
 
         if ($id) {
             $this->leave = \App\Models\LeaveRequest::findOrFail($id);
@@ -54,6 +74,7 @@ class LeaveRequestForm extends Page
 
             $this->isDetail = true;
         }
+    }
     }
 
     public function submit()

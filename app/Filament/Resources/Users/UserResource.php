@@ -5,15 +5,13 @@ namespace App\Filament\Resources\Users;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\User;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Filament\Tables;
 use Filament\Forms;
-use Spatie\Permission\Models\Role;
-use Filament\Forms\Components\Select;
 
 class UserResource extends Resource
 {
@@ -23,7 +21,7 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    // ✅ FORM (SUDAH FIX)
+    // ✅ FORM
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
@@ -32,16 +30,18 @@ class UserResource extends Resource
 
             Forms\Components\TextInput::make('email')
                 ->email()
-                ->required(),
+                ->required()
+                ->unique(ignoreRecord: true),
 
             Forms\Components\TextInput::make('password')
                 ->password()
-                ->required(),
+                ->dehydrated(fn ($state) => filled($state))
+                ->required(fn (string $context) => $context === 'create')
+                ->dehydrateStateUsing(fn ($state) => filled($state) ? bcrypt($state) : null),
 
-            // 🔥 INI YANG NAMPILIN ROLE
             Forms\Components\Select::make('roles')
                 ->label('Role')
-                ->multiple()
+                ->multiple(false)
                 ->relationship('roles', 'name')
                 ->preload()
                 ->required(),
@@ -55,18 +55,14 @@ class UserResource extends Resource
             Forms\Components\Select::make('company_id')
                 ->relationship('company', 'name')
                 ->searchable()
-                ->preload()
+                ->preload(),
         ]);
     }
 
-    // ✅ TABLE (AMAN TANPA ACTION DULU)
+    // ✅ TABLE (PAKAI CLASS TERPISAH)
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('email'),
-            ]);
+        return UsersTable::configure($table);
     }
 
     public static function getRelations(): array

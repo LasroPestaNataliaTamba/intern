@@ -29,15 +29,14 @@ class CompanyResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-
-        return $form
+        return $schema
             ->schema([
                 TextInput::make('name')
                     ->required(),
 
                 FileUpload::make('logo')
                     ->image()
-                    ->directory('images') // simpan ke storage/app/public/images
+                    ->directory('images')
                     ->required(),
             ]);
     }
