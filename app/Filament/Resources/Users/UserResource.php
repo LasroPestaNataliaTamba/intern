@@ -12,6 +12,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Columns\TextColumn;
 
 class UserResource extends Resource
 {
@@ -62,7 +64,40 @@ class UserResource extends Resource
     // ✅ TABLE (PAKAI CLASS TERPISAH)
     public static function table(Table $table): Table
     {
-        return UsersTable::configure($table);
+        return UsersTable::configure($table)
+        ->columns([
+                TextColumn::make('name')->label('Name')->searchable(),
+                TextColumn::make('email')->label('Email'),
+
+                    TextColumn::make('roles.name')
+                    ->label('Role')
+                    ->badge(), // biar tampil kayak tag
+
+                TextColumn::make('company.name')
+                    ->label('Company'),
+
+                TextColumn::make('division.name')
+                    ->label('Division'),
+        ])
+        ->filters([
+            // ✅ ROLE
+            SelectFilter::make('roles')
+                ->label('Role')
+                ->relationship('roles', 'name')
+                ->preload(),
+
+            // ✅ DIVISION
+            SelectFilter::make('division_id')
+                ->label('Division')
+                ->relationship('division', 'name')
+                ->preload(),
+
+            // ✅ COMPANY
+            SelectFilter::make('company_id')
+                ->label('Company')
+                ->relationship('company', 'name')
+                ->preload(),
+        ]);
     }
 
     public static function getRelations(): array
